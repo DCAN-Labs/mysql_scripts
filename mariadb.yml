@@ -1,0 +1,13 @@
+version: '3.1'
+
+    db:
+            image: mariadb
+            restart: always
+            environment:
+                    MYSQL_ROOT_PASSWORD: supersecret
+
+    adminer:
+            image: adminer
+            restart: always
+            ports:
+                    - 8080:8080
