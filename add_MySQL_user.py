@@ -4,8 +4,8 @@ import os
 
 
 user_prompt = "Enter a user: "
-password_prompt_1 = "Enter password: "
-password_prompt_2 = "Confirm password: "
+password_prompt_1 = "Enter password for {}: "
+password_prompt_2 = "Confirm password for {}: "
 no_match = "Passwords do not match, try again"
 
 
@@ -19,10 +19,10 @@ def get_user_name():
     return username.lower()
 
 
-def get_user_password():
+def get_user_password(user='user'):
     while True:
-        password1 = getpass.getpass(password_prompt_1)
-        password2 = getpass.getpass(password_prompt_2)
+        password1 = getpass.getpass(password_prompt_1.format(user))
+        password2 = getpass.getpass(password_prompt_2.format(user))
         if password1 == password2:
             break
         else:
@@ -31,10 +31,14 @@ def get_user_password():
 
 
 def connect():
+    """
+    Creates a connection instance with a MySQL datebase using 
+    supplied credentials via command line.
+    """
     while True:
         print("Enter admin credentials to connect to DB: \n")
         user = get_user_name()
-        password = get_user_password()
+        password = get_user_password(user)
         port = input("Enter port: ")
         try:
             connection = mysql.connect(user=user, password=password, port=port)
@@ -47,7 +51,7 @@ def connect():
 
 def add_user(connection):
     user = get_user_name()
-    password = get_user_password()
+    password = get_user_password(user)
     cursor = connection.cursor()
     local = "CREATE USER '"+ user + "'@'localhost' IDENTIFIED BY '" + password +"';"
     from_ip = "CREATE USER '" + user + "'@'%' IDENTIFIED BY '" + password + "';"
