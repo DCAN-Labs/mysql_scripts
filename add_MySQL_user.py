@@ -43,10 +43,32 @@ def connect():
         try:
             connection = mysql.connect(user=user, password=password, port=port)
             break
-        except:
-            print('err')
+        except mysql.Error as err:
+            print("Something went wrong with connection: {}".format(err))
 
     return connection
+
+
+def all_query(connection, query):
+    """
+    Makes a simple query on the database and returns the output of that result.
+    """
+    cursor = connection.cursor(dictionary=True)
+    cursor.execute(query)
+    return cursor
+
+
+def print_users(connection):
+    query = "select user, host from mysql.user;"
+    user_dict = all_query(connection, query)
+    user_list = []
+    for row in user_dict:
+        user_list.append("{user}@{host}".format(**row))
+    user_list.sort()
+    print("Current user list: \n")
+    for each in user_list:
+        print(each)
+    print('\n')
 
 
 def add_user(connection):
@@ -55,13 +77,16 @@ def add_user(connection):
     cursor = connection.cursor()
     local = "CREATE USER '"+ user + "'@'localhost' IDENTIFIED BY '" + password +"';"
     from_ip = "CREATE USER '" + user + "'@'%' IDENTIFIED BY '" + password + "';"
-    print("Statements to execute: \n", local, "\n", from_ip)
-    cursor.execute(local, params=None, multi=False)
-    cursor.execute(from_ip, params=None, multi=False)
+    try:
+        cursor.execute(local, params=None, multi=False)
+        cursor.execute(from_ip, params=None, multi=False)
+    except mysql.Error as err:
+        print("Something went wrong: {}".format(err))
     cursor.close()
     connection.close()
 
-
-connection = connect()
-add_user(connection)
+if __name__ == "__main__":
+    connection = connect()
+    print_users(connection)
+    add_user(connection)
 
