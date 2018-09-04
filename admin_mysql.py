@@ -1,7 +1,7 @@
 import getpass
 import mysql.connector as mysql
 import os
-
+import yaml
 
 user_prompt = "Enter a user: "
 password_prompt_1 = "Enter password for {}: "
@@ -84,6 +84,20 @@ def add_user(connection):
         print("Something went wrong: {}".format(err))
     cursor.close()
     connection.close()
+
+
+def load_yaml(file_name):
+    try:
+        with open(file_name, 'r') as stream:
+            yaml_doc = yaml.load(stream)
+            return yaml_doc
+    except FileNotFoundError as err:
+        print("Encountered {} , check to see if file path exists".format(err))
+        return None
+    except yaml.parser.ParserError as err:
+        print("Bad yaml: {}".format(err))
+        return None
+
 
 if __name__ == "__main__":
     connection = connect()

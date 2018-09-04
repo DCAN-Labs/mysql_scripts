@@ -1,0 +1,8 @@
+name: charlie
+database:
+  name: real_database
+  permissions: select
+  tables:
+    - table1
+    - table2
+    - table3
