@@ -3,6 +3,7 @@ import mysql.connector as mysql
 import os
 import yaml
 
+
 user_prompt = "Enter a user: "
 password_prompt_1 = "Enter password for {}: "
 password_prompt_2 = "Confirm password for {}: "
@@ -20,6 +21,10 @@ def get_user_name():
 
 
 def get_user_password(user='user'):
+    """
+    Gets and verifies entered password for a new user.
+    :param user: user who a password is being created for.
+    """
     while True:
         password1 = getpass.getpass(password_prompt_1.format(user))
         password2 = getpass.getpass(password_prompt_2.format(user))
@@ -38,8 +43,10 @@ def connect():
     while True:
         print("Enter admin credentials to connect to DB: \n")
         user = get_user_name()
-        password = get_user_password(user)
-        port = input("Enter port: ")
+        password = getpass.getpass(password_prompt_1.format(user))
+        port = input("Enter port (press enter to use default 3306): ")
+        if port is '':
+            port = 3306
         try:
             connection = mysql.connect(user=user, password=password, port=port)
             break
@@ -52,26 +59,42 @@ def connect():
 def all_query(connection, query):
     """
     Makes a simple query on the database and returns the output of that result.
+    :param connection: a MySQL connector datatype pointing to a DB
+    :param query: A SQL command to execute on the database.
     """
     cursor = connection.cursor(dictionary=True)
     cursor.execute(query)
     return cursor
 
 
-def print_users(connection):
+def print_users(connection, visible=True):
+    """
+    Prints to console all users in the database by default, if visible
+    is True console print is disabled and this function merely returns
+    a sorted list of all users
+    :param connection: a MySQL connector datatype pointing to a DB
+    :param visible: Boolean to turn on or off print statements to console.
+    """
     query = "select user, host from mysql.user;"
     user_dict = all_query(connection, query)
     user_list = []
     for row in user_dict:
         user_list.append("{user}@{host}".format(**row))
     user_list.sort()
-    print("Current user list: \n")
-    for each in user_list:
-        print(each)
-    print('\n')
+    if visible is True:
+        print("Current user list: \n")
+        for each in user_list:
+            print(each)
+        print('\n')
+    return user_list
 
 
 def add_user(connection):
+    """
+    Adds a user to a database located at the connection object passed
+    to it.
+    :param connection: a MySQL connector datatype pointing to a DB
+    """
     user = get_user_name()
     password = get_user_password(user)
     cursor = connection.cursor()
@@ -84,6 +107,45 @@ def add_user(connection):
         print("Something went wrong: {}".format(err))
     cursor.close()
     connection.close()
+
+
+def del_user(connection, user):
+    """
+    Creates a delete command given a connection and a user to delete.
+    :param connection: a MySQL connector datatype pointing to a DB
+    :param user: A string containing a username to be deleted
+    """ 
+
+    if user.lower() != "root":
+        drop_these = []
+        drop_these.append("DROP USER " + user + "@localhost;")
+        drop_these.append("DROP USER " + user + ";")
+        cursor = connection.cursor()
+        for each in drop_these:
+            try:
+                cursor.execute(each, params=None, multi=False)
+            except mysql.Error as err:
+                print("Unable to remove user: {} \n {}".format(user, err))
+    else:
+        print("Please Enter a valid user to remove.")
+    cursor.close()
+
+
+def remove_user(connection):
+    """
+    Removes a USER based on keyboard input using the del_user method.
+    :param connection: a MySQL connector datatype pointing to a DB
+    """
+    print("Current Users on server: \n")
+    print_users(connection)
+    once = input("Enter the name of the user to be removed: ")
+    twice = input("Re-enter the user's name to confirm :     ")
+    if once == twice and once.lower() != 'root':
+        del_user(connection, once)
+    elif once.lower() == twice.lower() == 'root':
+        print("Don't delete the root user")
+    else:
+        print("No user selected for deletion.")
 
 
 def load_yaml(file_name):
@@ -99,8 +161,15 @@ def load_yaml(file_name):
         return None
 
 
-if __name__ == "__main__":
+def create_database(connection):
+    pass
+
+
+def destory_database(connection):
+    pass
+
+""" if __name__ == "__main__":
     connection = connect()
     print_users(connection)
     add_user(connection)
-
+ """
