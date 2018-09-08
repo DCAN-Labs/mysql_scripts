@@ -162,6 +162,17 @@ def load_yaml(file_name):
         return None
 
 
+def grant_privileges_table(user, permissions, database, tables):
+    where = ('localhost', '%')
+    for both in where:
+        for table in tables:
+            statement = "GRANT {} ON {}.{} TO '{}'@'{}';"\
+                    .format(permissions, database, table, user, both)
+            yield statement
+    
+     
+
+
 def create_database(connection):
     pass
 

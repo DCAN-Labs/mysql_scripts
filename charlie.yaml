@@ -1,0 +1,10 @@
+user: charlie
+database: infant_db 
+permissions: select
+tables:
+  - ctq
+  - table
+  - table3
+  - pss
+  - ses
+  - stai
