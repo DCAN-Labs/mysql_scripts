@@ -1,3 +1,4 @@
+
 import getpass
 import mysql.connector as mysql
 import os
@@ -106,7 +107,6 @@ def add_user(connection):
     except mysql.Error as err:
         print("Something went wrong: {}".format(err))
     cursor.close()
-    connection.close()
 
 
 def del_user(connection, user):
@@ -124,6 +124,7 @@ def del_user(connection, user):
         for each in drop_these:
             try:
                 cursor.execute(each, params=None, multi=False)
+                print("Successfully applied: {}".format(each))
             except mysql.Error as err:
                 print("Unable to remove user: {} \n {}".format(user, err))
     else:
@@ -168,8 +169,6 @@ def create_database(connection):
 def destory_database(connection):
     pass
 
-""" if __name__ == "__main__":
+if __name__ == "__main__":
     connection = connect()
     print_users(connection)
-    add_user(connection)
- """

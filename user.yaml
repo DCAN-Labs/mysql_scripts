@@ -1,8 +1,11 @@
 name: charlie
 database:
-  name: real_database
+  name: infant_db 
   permissions: select
   tables:
-    - table1
+    - ctq
     - table2
     - table3
+    - pss
+    - ses
+    - stai
