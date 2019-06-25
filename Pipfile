@@ -1,16 +1,11 @@
 [[source]]
-name = "pypi"
 url = "https://pypi.org/simple"
 verify_ssl = true
-
-[requires]
-python_version = "3.5"
+name = "pypi"
 
 [dev-packages]
-pylint = "*"
 
 [packages]
-mysql-connector-python = "*"
-pandas = "*"
-argparse = "*"
-pyyaml = "*"
+
+[requires]
+python_version = "3.7"

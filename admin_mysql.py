@@ -2,6 +2,7 @@
 import getpass
 import mysql.connector as mysql
 import os
+import subprocess
 import yaml
 
 
@@ -34,6 +35,20 @@ def get_user_password(user='user'):
         else:
             print(no_match)
     return password1
+
+
+def backup_db(output_file=None):
+	"""
+	Create backup file containing all data stored in mysql database.
+	:param output_file: Path to backup file which will be created.
+	"""
+	# If no output filepath is given, use user's home directory as default
+	if not output_file:
+		output_file = "~/mysql_database_backup.sql"
+
+	# Run call to create database backup 
+	cmd = "mysqldump --all_databases -p > " + output_file
+	subprocess.run(cmd, shell=True)
 
 
 def connect():
